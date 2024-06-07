@@ -7,6 +7,7 @@ import "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 contract Degen is ERC20, Ownable {
     uint256[] internal itemIds;
     mapping(uint256 => Value) public items;
+    mapping(address => uint256[]) public userItems;  // Mapping to track user-owned items
 
     struct Value {
         string name;
@@ -49,6 +50,14 @@ contract Degen is ERC20, Ownable {
 
         _transfer(msg.sender, address(this), items[id].cost);
 
-        delete items[id];
+        // Add the redeemed item to the user's collection
+        userItems[msg.sender].push(id);
+        
+        // Optional: if the item should be removed from the available items list after being redeemed, uncomment the line below
+        // delete items[id];
+    }
+
+    function getUserItems(address user) external view returns (uint256[] memory) {
+        return userItems[user];
     }
 }
